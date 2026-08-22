@@ -1,0 +1,1355 @@
+Size: 63562 characters
+Copy everything below this line:
+==================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Berlin Tourist Mobility ABM</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100vh;overflow:hidden;font-family:Arial,sans-serif;background:#f8fafc;color:#1e293b}
+.app{display:flex;flex-direction:column;height:100vh}
+header{background:#1e40af;padding:8px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+header h1{font-size:15px;font-weight:700;color:#fff}
+header p{font-size:11px;color:#bfdbfe}
+.badge{color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:4px;background:rgba(255,255,255,0.2)}
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:290px;background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;flex-shrink:0}
+.sec{padding:10px 12px;border-bottom:1px solid #e2e8f0}
+.sec h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px}
+label{font-size:11px;color:#64748b;display:block;margin:5px 0 2px}
+select,input[type=range],input[type=number]{width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#1e293b;padding:5px 8px;font-size:12px;outline:none}
+input[type=range]{padding:2px 0;accent-color:#1e40af}
+.btn{width:100%;padding:8px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-green{background:#15803d;color:#fff}.btn-blue{background:#1e40af;color:#fff}
+.btn-red{background:#dc2626;color:#fff}
+.btn-gray{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.btn-outline{background:#fff;color:#1e40af;border:1px solid #1e40af}
+.btn-row{display:flex;gap:4px;margin-top:5px}.btn-row .btn{margin-top:0}
+.clock{font-size:30px;font-weight:800;color:#1e40af;text-align:center;letter-spacing:2px}
+.phase{text-align:center;font-size:10px;color:#94a3b8;text-transform:uppercase;margin:3px 0}
+.wbadge{display:inline-block;background:#f1f5f9;border-radius:20px;padding:2px 10px;font-size:11px;color:#475569}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.stat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 9px}
+.stat .v{font-size:18px;font-weight:700;color:#1e40af}.stat .l{font-size:9px;color:#94a3b8;text-transform:uppercase}
+.stat.red .v{color:#dc2626}.stat.green .v{color:#15803d}.stat.amber .v{color:#b45309}.stat.purple .v{color:#7c3aed}
+.modebar{height:8px;border-radius:4px;overflow:hidden;display:flex;margin:6px 0 4px}
+.modebar div{transition:width 0.5s}
+.modelabels{font-size:10px;color:#64748b;display:flex;gap:8px;flex-wrap:wrap}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:2px;vertical-align:middle}
+.nodelist{display:flex;flex-direction:column;gap:2px;max-height:120px;overflow-y:auto}
+.nodeitem{display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:3px;font-size:10px}
+.nodeitem.cr{background:#fee2e2}
+.nname{width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1e293b}
+.nbwrap{flex:1;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.nbbar{height:100%;border-radius:2px;transition:width 0.5s}
+.nocc{width:28px;text-align:right;color:#94a3b8;font-size:10px}
+.alerts{max-height:100px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.aitem{background:#f8fafc;border-left:3px solid #1e40af;border-radius:3px;padding:5px 8px;font-size:10px;line-height:1.5;cursor:pointer}
+.aitem.crowding{border-left-color:#dc2626}.aitem.mode_shift{border-left-color:#15803d}
+.aitem.alt{border-left-color:#b45309}.aitem.nudge_rejected{border-left-color:#94a3b8;opacity:0.7}
+.atime{color:#1e40af;font-weight:700;margin-right:4px}.atitle{font-weight:700;margin-right:3px}
+.recep-bar{display:flex;height:20px;border-radius:6px;overflow:hidden;margin:8px 0 4px;gap:1px}
+.recep-bar div{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;transition:width 0.5s;min-width:0;overflow:hidden}
+.recep-labels{display:flex;gap:6px;flex-wrap:wrap;font-size:9px}
+.recep-label{display:flex;align-items:center;gap:3px}
+.recep-dot{width:8px;height:8px;border-radius:50%}
+.recep-stat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;margin-top:6px}
+.recep-stat .rv{font-size:20px;font-weight:700;color:#1e40af}
+.recep-stat .rl{font-size:9px;color:#94a3b8;text-transform:uppercase}
+.recep-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}
+.recep-card{border-radius:6px;padding:6px 8px;border:1px solid}
+.recep-card .rn{font-size:16px;font-weight:700}.recep-card .rt{font-size:9px;text-transform:uppercase;margin-bottom:2px}
+.recep-card .rd{font-size:8px;margin-top:2px}
+.nudge-row{display:flex;align-items:center;gap:6px;margin:4px 0;font-size:11px}
+.nudge-row label{margin:0;width:130px;flex-shrink:0;color:#475569}
+.nudge-row input{flex:1;margin:0}
+.nudge-row span{width:34px;text-align:right;font-size:10px;color:#1e40af;font-weight:700}
+.compare-table{width:100%;border-collapse:collapse;font-size:9px;margin-top:6px}
+.compare-table th{background:#f1f5f9;padding:4px 5px;font-weight:700;color:#475569;text-align:center}
+.compare-table th:first-child{text-align:left}
+.compare-table td{padding:4px 5px;border-top:1px solid #f1f5f9}
+.maparea{flex:1;position:relative}
+#map{width:100%;height:100%}
+.legend{position:absolute;bottom:35px;right:10px;z-index:1000;background:rgba(255,255,255,0.96);border:1px solid #e2e8f0;border-radius:8px;padding:10px 13px;font-size:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.legend h4{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.lrow{display:flex;align-items:center;gap:6px;margin:3px 0;color:#475569}
+.ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.statusbar{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,0.94);border-top:1px solid #e2e8f0;padding:3px 12px;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between}
+.running{color:#15803d;font-weight:700}.stopped{color:#dc2626;font-weight:700}
+.modal-bg{display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:2000;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:10px;padding:24px;max-width:420px;width:90%;position:relative;box-shadow:0 8px 24px rgba(0,0,0,0.15)}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:12px;color:#1e40af}
+.modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer}
+.modal-row{display:flex;gap:8px;margin:8px 0;font-size:12px;align-items:center}
+.modal-label{color:#94a3b8;width:120px;flex-shrink:0}
+.modal-val{color:#1e293b;font-weight:600}
+.modal-input{flex:1;padding:6px 10px;border:1px solid #e2e8f0;border-radius:5px;font-size:13px;outline:none}
+.recep-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#fff}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#f8fafc}::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px}
+
+.quest-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.85);z-index:9000;display:flex;align-items:center;justify-content:center}
+.quest-box{background:#fff;border-radius:16px;padding:32px;max-width:480px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.quest-box h2{font-size:20px;font-weight:800;color:#1e40af;margin-bottom:6px}
+.quest-box p{font-size:12px;color:#64748b;margin-bottom:24px}
+.quest-q{margin-bottom:20px}
+.quest-q label{font-size:13px;font-weight:700;color:#1e293b;display:block;margin-bottom:8px}
+.quest-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quest-opt{padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.15s;color:#475569;text-align:center}
+.quest-opt:hover{border-color:#1e40af;color:#1e40af;background:#eff6ff}
+.quest-opt.selected{border-color:#1e40af;background:#1e40af;color:#fff}
+.quest-result{background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:16px;margin-top:16px;display:none}
+.quest-result h3{font-size:14px;font-weight:700;color:#15803d;margin-bottom:4px}
+.quest-result p{font-size:11px;color:#475569;margin:0}
+.quest-progress{height:4px;background:#e2e8f0;border-radius:2px;margin-bottom:20px}
+.quest-progress-bar{height:100%;background:#1e40af;border-radius:2px;transition:width 0.3s}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>Berlin Tourist Mobility ABM</h1>
+    <p>Data-Driven Simulation | MotionTag GPS | Mesa 3 | Nudge Receptivity | Hotel Starting Points</p>
+  </div>
+  <div style="margin-left:auto">
+    <span class="badge">Mesa 3</span><span class="badge">GeoPandas</span><span class="badge">OSMnx</span>
+    <span style="font-size:11px;color:#bfdbfe;margin-left:10px">Suhas Akula - SRH Berlin 2026</span>
+  </div>
+</header>
+<div class="body">
+<div class="sidebar">
+
+  <!-- CLOCK -->
+  <div class="sec" style="text-align:center">
+    <div class="clock" id="clock">07:00</div>
+    <div class="phase" id="phase">Morning Rush</div>
+    <div style="margin-top:5px"><span class="wbadge" id="wbadge">Clear</span></div>
+    <div style="font-size:9px;color:#94a3b8;margin-top:3px">Day <span id="day-count">1</span> | 5 min steps</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="sec">
+    <h3>Simulation Controls</h3>
+    <label>Scenario</label>
+    <select id="sel-scenario">
+      <option value="">Baseline - No Intervention</option>
+      <option value="S1">S1 - Crowding Alert</option>
+      <option value="S2">S2 - Alternative Destination Offer</option>
+      <option value="S3">S3 - Mode Shift Incentive</option>
+    </select>
+    <label>Weather</label>
+    <select id="sel-weather">
+      <option>Clear</option><option>Overcast</option>
+      <option>Light Rain</option><option>Heavy Rain</option>
+    </select>
+    <label>Tourist Agents: <b id="aglbl">200</b></label>
+    <input type="range" id="n-agents" min="50" max="500" step="50" value="200"
+           oninput="document.getElementById('aglbl').textContent=this.value">
+
+    <!-- SPEED SLIDER -->
+    <div style="margin-top:6px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:11px;color:#64748b;font-weight:600">Speed</span>
+        <span style="font-size:10px;color:#1e40af;font-weight:700" id="speed-label">Normal</span>
+      </div>
+      <input type="range" id="speed-slider" min="1" max="7" step="1" value="4"
+             oninput="setSpeed(this.value)">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8">
+        <span>Slow</span><span>Normal</span><span>Fast x10</span>
+      </div>
+    </div>
+
+    <button class="btn btn-green" id="btn-init">Initialise Simulation</button>
+    <div class="btn-row">
+      <button class="btn btn-blue"  id="btn-play">Play</button>
+      <button class="btn btn-red"   id="btn-pause">Stop</button>
+      <button class="btn btn-gray"  id="btn-step">Step</button>
+    </div>
+    <button class="btn btn-outline" id="btn-compare" style="margin-top:8px">Run Scenario Comparison</button>
+
+    <!-- MAP LAYER BUTTONS -->
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+      <button class="btn btn-gray" id="btn-routes"  onclick="toggleRoutes()">Show Route Lines</button>
+      <button class="btn btn-gray" id="btn-heatmap" onclick="toggleHeatmap()">Show Heatmap</button>
+      <button class="btn btn-gray" id="btn-bvg"     onclick="toggleBVG()">Show BVG Transit Lines</button>
+    </div>
+  </div>
+
+  <!-- NUDGE SETTINGS -->
+  <div class="sec">
+    <h3>Nudge Settings <span style="color:#94a3b8;font-weight:400;font-size:9px">(live)</span></h3>
+    <div class="nudge-row">
+      <label>Crowd Threshold</label>
+      <input type="range" id="ns-crowd" min="0.20" max="0.90" step="0.05" value="0.60"
+             oninput="updateNudge('crowd_threshold',this.value);document.getElementById('ns-crowd-val').textContent=Math.round(this.value*100)+'%'">
+      <span id="ns-crowd-val">60%</span>
+    </div>
+    <div class="nudge-row">
+      <label>S1 Receptivity</label>
+      <input type="range" id="ns-s1" min="0.10" max="1.00" step="0.05" value="0.75"
+             oninput="updateNudge('s1_receptivity',this.value);document.getElementById('ns-s1-val').textContent=parseFloat(this.value).toFixed(2)">
+      <span id="ns-s1-val">0.75</span>
+    </div>
+    <div class="nudge-row">
+      <label>S2 Receptivity</label>
+      <input type="range" id="ns-s2" min="0.10" max="1.00" step="0.05" value="0.45"
+             oninput="updateNudge('s2_receptivity',this.value);document.getElementById('ns-s2-val').textContent=parseFloat(this.value).toFixed(2)">
+      <span id="ns-s2-val">0.45</span>
+    </div>
+    <div class="nudge-row">
+      <label>S3 Receptivity</label>
+      <input type="range" id="ns-s3" min="0.10" max="1.00" step="0.05" value="0.20"
+             oninput="updateNudge('s3_receptivity',this.value);document.getElementById('ns-s3-val').textContent=parseFloat(this.value).toFixed(2)">
+      <span id="ns-s3-val">0.20</span>
+    </div>
+  </div>
+
+  <!-- LIVE STATS -->
+  <div class="sec">
+    <h3>Live Statistics</h3>
+    <div class="grid2">
+      <div class="stat">        <div class="v" id="s-active">0</div>    <div class="l">Active Agents</div></div>
+      <div class="stat red">    <div class="v" id="s-crowded">0/0</div>  <div class="l">Crowded Sites</div></div>
+      <div class="stat">        <div class="v" id="s-peak">0</div>      <div class="l">Peak Occupancy</div></div>
+      <div class="stat amber">  <div class="v" id="s-reroutes">0</div>  <div class="l">Reroutes</div></div>
+      <div class="stat green">  <div class="v" id="s-sust">0%</div>     <div class="l">Sustainable</div></div>
+      <div class="stat purple"> <div class="v" id="s-shifts">0</div>    <div class="l">Mode Shifts</div></div>
+      <div class="stat green"> <div class="v" id="s-satisfaction">0%</div> <div class="l">Avg Satisfaction</div></div>
+    </div>
+  </div>
+
+  <!-- MODE SHARE -->
+  <div class="sec">
+    <h3>Transport Mode Share</h3>
+    <div class="modebar">
+      <div id="b-walk" style="background:#15803d;width:70%"></div>
+      <div id="b-subway" style="background:#1e40af;width:22%"></div>
+      <div id="b-bike" style="background:#b45309;width:4%"></div>
+      <div id="b-car" style="background:#dc2626;width:4%"></div>
+    </div>
+    <div class="modelabels">
+      <span><span class="dot" style="background:#15803d"></span>Walk <span id="p-walk">72</span>%</span>
+      <span><span class="dot" style="background:#1e40af"></span>Subway <span id="p-subway">22</span>%</span>
+      <span><span class="dot" style="background:#dc2626"></span>Car <span id="p-car">4</span>%</span>
+    </div>
+  </div>
+
+  <!-- NUDGE RECEPTIVITY -->
+  <div class="sec">
+    <h3>Nudge Receptivity</h3>
+    <div class="recep-bar">
+      <div id="rb-high" style="background:#15803d;width:72%">High</div>
+      <div id="rb-medium" style="background:#d97706;width:22%">Med</div>
+      <div id="rb-low" style="background:#dc2626;width:4%"></div>
+      <div id="rb-vlow" style="background:#7c3aed;width:2%"></div>
+    </div>
+    <div class="recep-labels">
+      <span class="recep-label"><span class="recep-dot" style="background:#15803d"></span>High (0.75)</span>
+      <span class="recep-label"><span class="recep-dot" style="background:#d97706"></span>Medium (0.45)</span>
+      <span class="recep-label"><span class="recep-dot" style="background:#dc2626"></span>Low (0.20)</span>
+      <span class="recep-label"><span class="recep-dot" style="background:#7c3aed"></span>Very Low (0.15)</span>
+    </div>
+    <div class="recep-stat">
+      <div class="rv" id="accept-rate">0%</div>
+      <div class="rl">Overall nudge acceptance rate</div>
+    </div>
+    <div class="recep-grid">
+      <div class="recep-card" style="background:#f0fdf4;border-color:#86efac">
+        <div class="rt" style="color:#15803d">High</div>
+        <div class="rn" style="color:#15803d" id="rc-high">0</div>
+        <div class="rd" style="color:#15803d">Short walkers</div>
+      </div>
+      <div class="recep-card" style="background:#fffbeb;border-color:#fcd34d">
+        <div class="rt" style="color:#d97706">Medium</div>
+        <div class="rn" style="color:#d97706" id="rc-medium">0</div>
+        <div class="rd" style="color:#d97706">Comfort mixed</div>
+      </div>
+      <div class="recep-card" style="background:#fef2f2;border-color:#fca5a5">
+        <div class="rt" style="color:#dc2626">Low</div>
+        <div class="rn" style="color:#dc2626" id="rc-low">0</div>
+        <div class="rd" style="color:#dc2626">Long car</div>
+      </div>
+      <div class="recep-card" style="background:#f5f3ff;border-color:#c4b5fd">
+        <div class="rt" style="color:#7c3aed">Very Low</div>
+        <div class="rn" style="color:#7c3aed" id="rc-vlow">0</div>
+        <div class="rd" style="color:#7c3aed">Long rail</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO COMPARISON -->
+  <div class="sec" id="compare-sec" style="display:none">
+    <h3>Scenario Comparison</h3>
+    <div style="font-size:9px;color:#94a3b8;margin-bottom:4px">200 agents 120 steps. Green=better. Red=worse.</div>
+    <div id="compare-table"></div>
+  </div>
+
+
+  <!-- PREDICTION PANEL -->
+  <div class="sec">
+    <h3>Crowding Prediction <span style="color:#94a3b8;font-weight:400;font-size:9px">(next 30 min)</span></h3>
+    <div style="font-size:9px;color:#64748b;margin-bottom:6px">
+      Based on current agent movement patterns.
+    </div>
+    <div id="prediction-list" class="nodelist"></div>
+  </div>
+
+  <!-- HOTEL LIST -->
+  <div class="sec">
+    <h3>Hotel Starting Points</h3>
+    <div id="hotel-list" class="nodelist"></div>
+  </div>
+
+  <!-- ATTRACTION OCCUPANCY -->
+  <div class="sec">
+    <h3>Attraction Occupancy <span style="color:#94a3b8;font-weight:400;font-size:9px">(click to edit)</span></h3>
+    <div class="nodelist" id="nodelist"></div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="sec">
+    <h3>Live Alerts <span style="color:#94a3b8;font-weight:400;font-size:9px">(click for details)</span></h3>
+    <div class="alerts" id="alerts">
+      <div style="color:#94a3b8;font-size:10px;padding:3px">Alerts appear when agents receive nudges.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAP -->
+<div class="maparea">
+  <div id="map"></div>
+  <div class="legend">
+    <h4>Personas + Receptivity</h4>
+    <div class="lrow"><div class="ldot" style="background:#15803d"></div>Short Walker — High (72%)</div>
+    <div class="lrow"><div class="ldot" style="background:#1e40af"></div>Comfort Mixed — Medium (22%)</div>
+    <div class="lrow"><div class="ldot" style="background:#dc2626"></div>Long Car — Low (4%)</div>
+    <div class="lrow"><div class="ldot" style="background:#7c3aed"></div>Long Rail — Very Low (2%)</div>
+    <h4 style="margin-top:8px">Crowding</h4>
+    <div class="lrow"><div class="ldot" style="background:#15803d"></div>Normal &lt;60%</div>
+    <div class="lrow"><div class="ldot" style="background:#d97706"></div>Near 60-90%</div>
+    <div class="lrow"><div class="ldot" style="background:#dc2626"></div>Overcrowded &gt;90%</div>
+    <div style="margin-top:5px;font-size:9px;color:#94a3b8">Click any circle to edit capacity</div>
+  </div>
+  <div class="statusbar">
+    <span id="statustext">Initialise the simulation to begin.</span>
+    <span id="simstatus" class="stopped">Stopped</span>
+  </div>
+
+  <!-- ALERT MODAL -->
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal">
+      <button class="modal-close" id="modal-close">×</button>
+      <h2 id="modal-title">Alert Detail</h2>
+      <div class="modal-row"><div class="modal-label">Time</div>        <div class="modal-val" id="modal-time"></div></div>
+      <div class="modal-row"><div class="modal-label">Persona</div>     <div class="modal-val" id="modal-persona"></div></div>
+      <div class="modal-row"><div class="modal-label">Hotel</div>       <div class="modal-val" id="modal-hotel"></div></div>
+      <div class="modal-row"><div class="modal-label">Receptivity</div> <div class="modal-val" id="modal-recep"></div></div>
+      <div class="modal-row"><div class="modal-label">From</div>        <div class="modal-val" id="modal-from"></div></div>
+      <div class="modal-row"><div class="modal-label">To</div>          <div class="modal-val" id="modal-to"></div></div>
+      <div class="modal-row"><div class="modal-label">Details</div>     <div class="modal-val" id="modal-msg"></div></div>
+    </div>
+  </div>
+
+  <!-- CAPACITY MODAL -->
+  <div class="modal-bg" id="cap-modal-bg">
+    <div class="modal">
+      <button class="modal-close" id="cap-modal-close">×</button>
+      <h2 id="cap-modal-title">Edit Capacity</h2>
+      <div style="font-size:11px;color:#64748b;margin-bottom:12px">Change maximum capacity of this location.</div>
+      <div class="modal-row"><div class="modal-label">Location</div>        <div class="modal-val" id="cap-name"></div></div>
+      <div class="modal-row"><div class="modal-label">Current Occupancy</div><div class="modal-val" id="cap-occ"></div></div>
+      <div class="modal-row"><div class="modal-label">Current Capacity</div> <div class="modal-val" id="cap-current"></div></div>
+      <div class="modal-row" style="margin-top:12px">
+        <div class="modal-label">New Capacity</div>
+        <input type="number" class="modal-input" id="cap-input" min="5" max="500" step="5">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-green" style="flex:1;padding:10px" onclick="saveCapacity()">Save</button>
+        <button class="btn btn-gray"  style="flex:1;padding:10px" onclick="closeCapModal()">Cancel</button>
+      </div>
+      <div id="cap-feedback" style="margin-top:8px;font-size:11px;color:#15803d;text-align:center;display:none">Capacity updated!</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+var ATTRACTIONS = {{ attractions | tojson }};
+var RECEP_COLORS = {High:'#15803d',Medium:'#d97706',Low:'#dc2626','Very Low':'#7c3aed'};
+var PERSONA_COLORS = {ShortWalker:'#15803d',ComfortMixed:'#1e40af',LongDistanceCar:'#dc2626',LongDistanceRail:'#7c3aed'};
+
+// ── LEAFLET MAP ───────────────────────────────────────────────────────────────
+var map = L.map('map',{center:[52.515,13.388],zoom:12,zoomControl:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+  attribution:'CartoDB | OpenStreetMap',subdomains:'abcd',maxZoom:19
+}).addTo(map);
+
+// ── ATTRACTION CIRCLES ────────────────────────────────────────────────────────
+var attrCircles = {};
+var lastNodes = {};
+var lastAgents = [];
+
+Object.entries(ATTRACTIONS).forEach(function(e){
+  var name=e[0], c=e[1];
+  var circle=L.circle([c[0],c[1]],{radius:100,color:'#15803d',fillColor:'#15803d',fillOpacity:0.25,weight:2}).addTo(map);
+  circle.on('click',function(){openCapModal(name);});
+  circle.bindTooltip('<b>'+name+'</b><br>Capacity: '+c[2]+'<br><i>Click to edit</i>',{sticky:true,direction:'top'});
+  var icon=L.divIcon({html:'<div style="background:rgba(255,255,255,0.92);border:1px solid #e2e8f0;border-radius:3px;padding:1px 4px;font-size:8px;font-weight:700;color:#1e293b;white-space:nowrap">'+name+'</div>',iconAnchor:[0,0],className:''});
+  L.marker([c[0],c[1]],{icon:icon,interactive:false,zIndexOffset:-100}).addTo(map);
+  attrCircles[name]=circle;
+});
+
+function updateCircles(nodes){
+  lastNodes=nodes;
+  Object.entries(nodes).forEach(function(e){
+    var name=e[0],nd=e[1],c=attrCircles[name]; if(!c)return;
+    var r=nd.ratio||0,color=r<0.6?'#15803d':r<0.9?'#d97706':'#dc2626';
+    c.setStyle({color:color,fillColor:color,fillOpacity:0.2+r*0.4});
+    c.setRadius(90+nd.occupancy*2.5);
+    c.setTooltipContent('<b>'+name+'</b><br>'+nd.occupancy+'/'+nd.capacity+' ('+Math.round(r*100)+'%)'+(nd.crowded?'<br><b style="color:#dc2626">OVERCROWDED</b>':'')+'<br><i style="color:#94a3b8">Click to edit capacity</i>');
+  });
+}
+
+// ── CAPACITY MODAL ────────────────────────────────────────────────────────────
+var capModalBg=document.getElementById('cap-modal-bg');
+var currentCapName=null;
+function openCapModal(name){
+  currentCapName=name;
+  document.getElementById('cap-modal-title').textContent='Edit — '+name;
+  document.getElementById('cap-name').textContent=name;
+  var baseCapacity=ATTRACTIONS[name]?ATTRACTIONS[name][2]:30;
+  document.getElementById('cap-current').textContent=baseCapacity;
+  document.getElementById('cap-input').value=baseCapacity;
+  var occ=lastNodes&&lastNodes[name]?lastNodes[name].occupancy:0;
+  document.getElementById('cap-occ').textContent=occ+' agents here';
+  document.getElementById('cap-feedback').style.display='none';
+  capModalBg.classList.add('open');
+}
+function closeCapModal(){capModalBg.classList.remove('open');currentCapName=null;}
+function saveCapacity(){
+  if(!currentCapName)return;
+  var newCap=parseInt(document.getElementById('cap-input').value);
+  if(isNaN(newCap)||newCap<5){alert('Minimum 5');return;}
+  fetch('/api/set_capacity',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:currentCapName,capacity:newCap})
+  }).then(function(r){return r.json();}).then(function(){
+    document.getElementById('cap-current').textContent=newCap;
+    document.getElementById('cap-feedback').style.display='block';
+    setTimeout(function(){closeCapModal();},1200);
+  });
+}
+capModalBg.onclick=function(e){if(e.target===capModalBg)closeCapModal();};
+document.getElementById('cap-modal-close').onclick=closeCapModal;
+
+// ── SPEED CONTROL ─────────────────────────────────────────────────────────────
+var SPEED_MAP={1:2.0,2:1.0,3:0.6,4:0.35,5:0.15,6:0.07,7:0.02};
+var SPEED_LABELS={1:'Very Slow',2:'Slow',3:'Medium',4:'Normal',5:'Fast x3',6:'Fast x7',7:'Fast x10'};
+function setSpeed(v){
+  setText('speed-label',SPEED_LABELS[v]||'Normal');
+  fetch('/api/set_speed',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({speed:SPEED_MAP[v]||0.35})});
+}
+
+// ── NUDGE SETTINGS ────────────────────────────────────────────────────────────
+var nudgeSettings={crowd_threshold:0.60,s1_receptivity:0.75,s2_receptivity:0.45,s3_receptivity:0.20};
+function updateNudge(key,value){
+  nudgeSettings[key]=parseFloat(value);
+  fetch('/api/set_nudge',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(nudgeSettings)});
+}
+
+// ── ROUTE LINES ───────────────────────────────────────────────────────────────
+var routeLines=[];
+var showRoutes=false;
+function toggleRoutes(){
+  showRoutes=!showRoutes;
+  var btn=document.getElementById('btn-routes');
+  btn.textContent=showRoutes?'Hide Route Lines':'Show Route Lines';
+  btn.style.background=showRoutes?'#15803d':'';
+  btn.style.color=showRoutes?'#fff':'';
+  if(!showRoutes){routeLines.forEach(function(l){map.removeLayer(l);});routeLines=[];}
+  else if(lastAgents.length>0){drawRouteLines(lastAgents);}
+}
+function drawRouteLines(agents){
+  routeLines.forEach(function(l){map.removeLayer(l);});
+  routeLines=[];
+  if(!showRoutes)return;
+  agents.forEach(function(a){
+    var from=ATTRACTIONS[a.current];
+    var to=ATTRACTIONS[a.dest];
+    if(!from||!to)return;
+    var color=PERSONA_COLORS[a.persona]||'#64748b';
+    var line=L.polyline([[from[0],from[1]],[to[0],to[1]]],{
+      color:color,weight:1.5,opacity:0.4,dashArray:'5 5'
+    }).addTo(map);
+    routeLines.push(line);
+  });
+}
+
+// ── HEATMAP ───────────────────────────────────────────────────────────────────
+var heatmapOverlay=null;
+var showHeatmap=false;
+function toggleHeatmap(){
+  showHeatmap=!showHeatmap;
+  var btn=document.getElementById('btn-heatmap');
+  btn.textContent=showHeatmap?'Hide Heatmap':'Show Heatmap';
+  btn.style.background=showHeatmap?'#dc2626':'';
+  btn.style.color=showHeatmap?'#fff':'';
+  if(!showHeatmap&&heatmapOverlay){map.removeLayer(heatmapOverlay);heatmapOverlay=null;}
+  else if(showHeatmap&&Object.keys(lastNodes).length>0){drawHeatmap(lastNodes);}
+  re
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();
+  re
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();
+}
+function drawHeatmap(nodes){
+  if(!showHeatmap)return;
+  if(heatmapOverlay){map.removeLayer(heatmapOverlay);heatmapOverlay=null;}
+  var size=map.getSize();
+  var canvas=document.createElement('canvas');
+  canvas.width=size.x;canvas.height=size.y;
+  var ctx=canvas.getContext('2d');
+  Object.entries(nodes).forEach(function(e){
+    var nd=e[1];
+    if(!nd.lat||!nd.lon)return;
+    var pt=map.latLngToContainerPoint([nd.lat,nd.lon]);
+    var r=nd.ratio||0; if(r<0.1)return;
+    var radius=50+r*70;
+    var alpha=Math.min(0.55,r*0.65);
+    var grad=ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,radius);
+    var col=r<0.6?'21,128,61':r<0.9?'217,119,6':'220,38,38';
+    grad.addColorStop(0,'rgba('+col+','+alpha+')');
+    grad.addColorStop(1,'rgba('+col+',0)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.arc(pt.x,pt.y,radius,0,Math.PI*2);ctx.fill();
+  });
+  var bounds=map.getBounds();
+  heatmapOverlay=L.imageOverlay(canvas.toDataURL(),bounds,{opacity:0.6,interactive:false}).addTo(map);
+  map.on('moveend zoomend',function(){if(showHeatmap)drawHeatmap(lastNodes);});
+}
+
+// ── BVG TRANSIT NETWORK ───────────────────────────────────────────────────────
+var bvgLayers=[];
+var showBVG=false;
+var BVG_LINES=[
+  {name:'U1',color:'#7DAB3C',coords:[[52.4907,13.3489],[52.4933,13.3527],[52.5001,13.3634],[52.5016,13.3803],[52.5030,13.3926],[52.5032,13.4090],[52.5054,13.4262]]},
+  {name:'U2',color:'#DA421E',coords:[[52.5069,13.3325],[52.5096,13.3522],[52.5145,13.3501],[52.5163,13.3777],[52.5170,13.3888],[52.5200,13.3879],[52.5219,13.4132],[52.5267,13.4317]]},
+  {name:'U5',color:'#7E4F9E',coords:[[52.5251,13.3694],[52.5219,13.4132],[52.5192,13.4011],[52.5152,13.4429],[52.5106,13.4717],[52.5031,13.5238]]},
+  {name:'U6',color:'#8C6DAB',coords:[[52.5597,13.2910],[52.5485,13.3673],[52.5251,13.3694],[52.5170,13.3888],[52.5080,13.3815],[52.4877,13.3811],[52.4733,13.4037]]},
+  {name:'U7',color:'#006CB4',coords:[[52.5343,13.1973],[52.5069,13.3325],[52.4979,13.3432],[52.4877,13.3811],[52.4871,13.4254],[52.4748,13.4327]]},
+  {name:'U8',color:'#214593',coords:[[52.5548,13.3318],[52.5487,13.3884],[52.5219,13.4132],[52.5130,13.4185],[52.4993,13.4185],[52.4871,13.4254]]},
+  {name:'U9',color:'#F4A800',coords:[[52.5477,13.3316],[52.5251,13.3694],[52.5069,13.3325],[52.4979,13.3432],[52.4853,13.3434]]},
+  {name:'S Ring',color:'#B2B2B2',coords:[[52.5487,13.3884],[52.5441,13.4653],[52.5106,13.4717],[52.4993,13.4531],[52.4756,13.3654],[52.5080,13.3815],[52.5251,13.3694],[52.5487,13.3884]]},
+  {name:'S1',color:'#DA68A0',coords:[[52.5597,13.2910],[52.5251,13.3694],[52.5200,13.3879],[52.5106,13.4346],[52.4877,13.4683]]},
+  {name:'S3/5/7',color:'#00A651',coords:[[52.5106,13.4346],[52.5200,13.3879],[52.5251,13.3694],[52.5069,13.3325],[52.4331,13.1800]]},
+  {name:'S9',color:'#97222A',coords:[[52.5106,13.4346],[52.5031,13.5238],[52.3667,13.5033]]},
+];
+function toggleBVG(){
+  showBVG=!showBVG;
+  var btn=document.getElementById('btn-bvg');
+  btn.textContent=showBVG?'Hide BVG Lines':'Show BVG Transit Lines';
+  btn.style.background=showBVG?'#1e40af':'';
+  btn.style.color=showBVG?'#fff':'';
+  if(showBVG){
+    BVG_LINES.forEach(function(line){
+      var poly=L.polyline(line.coords,{color:line.color,weight:3,opacity:0.8}).addTo(map);
+      poly.bindTooltip('<b>'+line.name+'</b>',{sticky:true});
+      bvgLayers.push(poly);
+      line.coords.forEach(function(coord){
+        var dot=L.circleMarker(coord,{radius:4,color:line.color,fillColor:'#fff',fillOpacity:1,weight:2}).addTo(map);
+        bvgLayers.push(dot);
+      });
+    });
+  } else {
+    bvgLayers.forEach(function(l){map.removeLayer(l);});
+    bvgLayers=[];
+  }
+}
+
+// ── AGENT MARKERS ─────────────────────────────────────────────────────────────
+var agentMarkers={};
+function makeAgentIcon(color){
+  return L.divIcon({html:'<div style="width:10px;height:10px;background:'+color+';border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:0 0 4px rgba(0,0,0,0.3)"></div>',iconAnchor:[5,5],className:''});
+}
+function updateAgents(agents){
+  lastAgents=agents;
+  var seen={};
+  agents.forEach(function(a){
+    seen[a.id]=true;
+    var color=PERSONA_COLORS[a.persona]||'#64748b';
+    var rcolor=RECEP_COLORS[a.receptivity]||'#64748b';
+    var tip='<b>'+a.persona+'</b><br>Hotel: <b>'+a.hotel+'</b><br>At: '+a.current+'<br>Going to: '+(a.dest||'?')+'<br>Mode: '+a.mode+'<br><b>Receptivity: <span style="color:'+rcolor+'">'+a.receptivity+'</span></b><br>Nudges: '+a.nudges_recv+' recv / '+a.nudges_acc+' accepted ('+a.accept_rate+'%)<br>Visits: '+a.visits;
+    if(agentMarkers[a.id]){agentMarkers[a.id].setLatLng([a.lat,a.lon]);agentMarkers[a.id].setTooltipContent(tip);}
+    else{var m=L.marker([a.lat,a.lon],{icon:makeAgentIcon(color),zIndexOffset:1000});m.bindTooltip(tip,{sticky:true});m.addTo(map);agentMarkers[a.id]=m;}
+  });
+  Object.keys(agentMarkers).forEach(function(id){if(!seen[id]){map.removeLayer(agentMarkers[id]);delete agentMarkers[id];}});
+  drawRouteLines(agents);
+}
+
+// ── ALERT MODAL ───────────────────────────────────────────────────────────────
+var modalBg=document.getElementById('modal-bg');
+document.getElementById('modal-close').onclick=function(){modalBg.classList.remove('open');};
+modalBg.onclick=function(e){if(e.target===modalBg)modalBg.classList.remove('open');};
+function showAlertDetail(al){
+  document.getElementById('modal-title').textContent=al.title||'Alert';
+  document.getElementById('modal-time').textContent=al.time||'--:--';
+  document.getElementById('modal-persona').textContent=al.persona||'Unknown';
+  document.getElementById('modal-hotel').textContent=al.hotel||'-';
+  document.getElementById('modal-from').textContent=al.from||'-';
+  document.getElementById('modal-to').textContent=al.to||'-';
+  document.getElementById('modal-msg').textContent=al.msg||'';
+  var recep=al.receptivity||'Unknown';
+  document.getElementById('modal-recep').innerHTML='<span class="recep-pill" style="background:'+(RECEP_COLORS[recep]||'#64748b')+'">'+recep+'</span>';
+  modalBg.classList.add('open');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function setText(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setWidth(id,p){var e=document.getElementById(id);if(e)e.style.width=Math.max(0,Math.min(100,p))+'%';}
+
+function updateReceptivity(s){
+  var total=s.active_agents||1;
+  setWidth('rb-high',(s.receptivity_high||0)/total*100);
+  setWidth('rb-medium',(s.receptivity_medium||0)/total*100);
+  setWidth('rb-low',(s.receptivity_low||0)/total*100);
+  setWidth('rb-vlow',(s.receptivity_vlow||0)/total*100);
+  setText('rc-high',s.receptivity_high||0);setText('rc-medium',s.receptivity_medium||0);
+  setText('rc-low',s.receptivity_low||0);setText('rc-vlow',s.receptivity_vlow||0);
+  setText('accept-rate',(s.nudge_acceptance_rate||0)+'%');
+}
+
+
+function updatePredictions(nodes, agents) {
+  // Predict which sites will be crowded in next 30 min
+  // Based on how many agents are heading toward each site
+  var incoming = {};
+  agents.forEach(function(a) {
+    if (a.dest) incoming[a.dest] = (incoming[a.dest]||0) + 1;
+  });
+
+  // Combine current occupancy + incoming agents
+  var predictions = Object.entries(nodes).map(function(e) {
+    var name=e[0], nd=e[1];
+    var future = nd.occupancy + (incoming[name]||0);
+    var futureRatio = future / Math.max(1, nd.capacity);
+    return {name:name, current:nd.ratio, future:futureRatio, incoming:incoming[name]||0};
+  }).filter(function(p){ return p.future > 0.2; })
+    .sort(function(a,b){ return b.future - a.future; })
+    .slice(0,8);
+
+  document.getElementById('prediction-list').innerHTML = predictions.map(function(p){
+    var color = p.future < 0.5 ? '#15803d' : p.future < 0.8 ? '#d97706' : '#dc2626';
+    var trend = p.future > p.current ? '↑' : p.future < p.current ? '↓' : '→';
+    var pct = Math.round(p.future*100);
+    return '<div class="nodeitem">'
+      +'<div class="nname">'+p.name+'</div>'
+      +'<div class="nbwrap"><div class="nbbar" style="width:'+Math.min(100,pct)+'%;background:'+color+'"></div></div>'
+      +'<div class="nocc" style="color:'+color+'">'+trend+pct+'%</div>'
+      +'</div>';
+  }).join('');
+}
+
+function updateHotelList(s){
+  if(!s.hotel_distribution)return;
+  var sorted=Object.entries(s.hotel_distribution).sort(function(a,b){return b[1]-a[1];});
+  var total=s.active_agents||1;
+  document.getElementById('hotel-list').innerHTML=sorted.map(function(e){
+    var name=e[0],count=e[1],pct=Math.round(count/total*100);
+    return '<div class="nodeitem"><div class="nname">'+name+'</div><div class="nbwrap"><div class="nbbar" style="width:'+pct+'%;background:#1e40af"></div></div><div class="nocc">'+count+'</div></div>';
+  }).join('');
+}
+
+// ── MAIN UI UPDATE ────────────────────────────────────────────────────────────
+function updateUI(data){
+  var s=data.stats||{};
+  setText('clock',s.hour||'07:00');setText('phase',s.phase||'');setText('wbadge',s.weather||'Clear');
+  setText('day-count',(data.day_count||0)+1);
+  setText('s-active',s.active_agents!=null?s.active_agents:'0');
+  setText('s-crowded',s.crowded_nodes!=null?s.crowded_nodes+'/'+s.total_nodes:'0/0');
+  setText('s-peak',s.peak_occupancy!=null?s.peak_occupancy:'0');
+  setText('s-reroutes',s.total_reroutes!=null?s.total_reroutes:'0');
+  setText('s-sust',s.sustainable_pct!=null?s.sustainable_pct+'%':'0%');
+  setText('s-shifts',s.total_shifts!=null?s.total_shifts:'0');
+  setText('s-satisfaction',s.avg_satisfaction!=null?Math.round(s.avg_satisfaction)+'%':'--');
+  var w=s.walk_pct||0,sub=s.subway_pct||0,car=s.car_pct||0;
+  setWidth('b-walk',w);setWidth('b-subway',sub);setWidth('b-car',car);setWidth('b-bike',Math.max(0,100-w-sub-car));
+  setText('p-walk',w);setText('p-subway',sub);setText('p-car',car);
+  updateReceptivity(s);updateHotelList(s);
+  if(data.agents&&data.nodes)updatePredictions(data.nodes,data.agents);
+  if(data.nodes){
+    updateCircles(data.nodes);
+    if(!isZooming)drawHeatmap(data.nodes);
+    var sorted=Object.entries(data.nodes).sort(function(a,b){return b[1].ratio-a[1].ratio;});
+    document.getElementById('nodelist').innerHTML=sorted.map(function(e){
+      var name=e[0],nd=e[1],pct=Math.round(nd.ratio*100);
+      var color=nd.crowded?'#dc2626':pct>60?'#d97706':'#15803d';
+      return '<div class="nodeitem '+(nd.crowded?'cr':'')+'" onclick="openCapModal(\''+name.replace(/'/g,"\\'")+'\')" style="cursor:pointer"><div class="nname">'+name+'</div><div class="nbwrap"><div class="nbbar" style="width:'+Math.min(100,pct)+'%;background:'+color+'"></div></div><div class="nocc">'+pct+'%</div></div>';
+    }).join('');
+  }
+  if(data.agents && !isZooming)updateAgents(data.agents);
+  if(data.alerts&&data.alerts.length>0){
+    var box=document.getElementById('alerts');
+    var html=data.alerts.map(function(al,idx){
+      var cls=al.type==='crowding'?'crowding':al.type==='mode_shift'?'mode_shift':al.type==='nudge_rejected'?'nudge_rejected':'alt';
+      return '<div class="aitem '+cls+'" data-idx="'+idx+'"><span class="atime">'+al.time+'</span><span class="atitle">'+al.title+'</span> '+al.msg+'</div>';
+    }).join('');
+    box.innerHTML=html+box.innerHTML;
+    box.querySelectorAll('.aitem[data-idx]').forEach(function(el){
+      var idx=parseInt(el.getAttribute('data-idx'));var al=data.alerts[idx];
+      el.onclick=function(){showAlertDetail(al);};el.removeAttribute('data-idx');
+    });
+    var items=box.querySelectorAll('.aitem');
+    if(items.length>25)for(var i=25;i<items.length;i++)items[i].remove();
+  }
+  setText('statustext','Step '+(data.step||0)+' | '+(s.active_agents||0)+' agents | '+(s.crowded_nodes||0)+'/'+(s.total_nodes||0)+' crowded | '+(s.hour||'07:00'));
+  var el=document.getElementById('simstatus');
+  el.textContent=data.running?'Running':'Stopped';
+  el.className=data.running?'running':'stopped';
+}
+
+// ── POLLING ───────────────────────────────────────────────────────────────────
+var pollTimer=null;
+function poll(){fetch('/api/state').then(function(r){return r.json();}).then(function(data){updateUI(data);}).catch(function(){});}
+function startPolling(){
+  if(pollTimer)clearInterval(pollTimer);
+  var interval = showHeatmap ? 800 : 350;
+  pollTimer=setInterval(poll,interval);
+}
+function restartPolling(){
+  if(pollTimer)clearInterval(pollTimer);
+  
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();
+}
+
+// ── SCENARIO COMPARISON ───────────────────────────────────────────────────────
+function runComparison(){
+  var btn=document.getElementById('btn-compare');
+  btn.textContent='Running... (~15 sec)';btn.disabled=true;
+  fetch('/api/compare').then(function(r){return r.json();}).then(function(data){
+    document.getElementById('compare-sec').style.display='block';
+    var labels=['Baseline','S1','S2','S3'],colors=['#64748b','#dc2626','#15803d','#7c3aed'];
+    var baseline=data['Baseline'];
+    var rows=[
+      {key:'crowded_nodes',label:'Crowded nodes',suffix:'',better:'lower'},
+      {key:'total_reroutes',label:'Reroutes',suffix:'',better:'higher'},
+      {key:'total_shifts',label:'Mode shifts',suffix:'',better:'higher'},
+      {key:'walk_pct',label:'Walk %',suffix:'%',better:'higher'},
+      {key:'car_pct',label:'Car %',suffix:'%',better:'lower'},
+      {key:'sustainable_pct',label:'Sustainable %',suffix:'%',better:'higher'},
+      {key:'nudge_acceptance_rate',label:'Nudge acceptance',suffix:'%',better:'higher'},
+    ];
+    var html='<table class="compare-table"><tr><th>Metric</th>';
+    labels.forEach(function(l,i){html+='<th style="color:'+colors[i]+'">'+l+'</th>';});
+    html+='</tr>';
+    rows.forEach(function(row,ri){
+      html+='<tr style="background:'+(ri%2===0?'#fff':'#f8fafc')+'">';
+      html+='<td style="color:#475569;white-space:nowrap">'+row.label+'</td>';
+      labels.forEach(function(l,i){
+        var val=data[l][row.key],base=baseline[row.key];
+        var diff=parseFloat((val-base).toFixed(1));
+        var better=(row.better==='lower'&&diff<0)||(row.better==='higher'&&diff>0);
+        var worse=(row.better==='lower'&&diff>0)||(row.better==='higher'&&diff<0);
+        var bg=i===0?'transparent':better?'rgba(21,128,61,0.1)':worse?'rgba(220,38,38,0.1)':'transparent';
+        var diffStr=i===0?'':(diff>0?'+'+diff:(diff===0?'=':diff));
+        var diffColor=better?'#15803d':worse?'#dc2626':'#94a3b8';
+        html+='<td style="text-align:center;font-weight:700;color:'+colors[i]+';background:'+bg+'">';
+        html+=val+row.suffix;
+        if(i>0)html+='<br><span style="font-size:8px;font-weight:400;color:'+diffColor+'">'+diffStr+'</span>';
+        html+='</td>';
+      });
+      html+='</tr>';
+    });
+    html+='</table>';
+    document.getElementById('compare-table').innerHTML=html;
+    btn.textContent='Refresh Comparison';btn.disabled=false;
+  }).catch(function(){btn.textContent='Run Scenario Comparison';btn.disabled=false;});
+}
+
+// ── SIMULATION CONTROLS ───────────────────────────────────────────────────────
+function initSim(){
+  var scenario=document.getElementById('sel-scenario').value||null;
+  var weather=document.getElementById('sel-weather').value;
+  var nAgents=parseInt(document.getElementById('n-agents').value);
+  Object.keys(agentMarkers).forEach(function(id){map.removeLayer(agentMarkers[id]);delete agentMarkers[id];});
+  routeLines.forEach(function(l){map.removeLayer(l);});routeLines=[];
+  document.getElementById('alerts').innerHTML='<div style="color:#94a3b8;font-size:10px;padding:3px">Initialising...</div>';
+  fetch('/api/init',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({scenario:scenario,weather:weather,n_agents:nAgents,seed:42})
+  }).then(function(r){return r.json();}).then(function(data){
+    setText('statustext',data.message||'Ready');
+    document.getElementById('alerts').innerHTML='<div style="color:#15803d;font-size:10px;padding:3px">Ready — press Play</div>';
+    fetch('/api/set_nudge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nudgeSettings)});
+    
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();
+  });
+}
+function startSim(){fetch('/api/start',{method:'POST'});
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();}
+function stopSim() {fetch('/api/pause',{method:'POST'});}
+function stepSim() {fetch('/api/step', {method:'POST'});}
+
+document.getElementById('btn-init').onclick    = initSim;
+document.getElementById('btn-play').onclick    = startSim;
+document.getElementById('btn-pause').onclick   = stopSim;
+document.getElementById('btn-step').onclick    = stepSim;
+document.getElementById('btn-compare').onclick = runComparison;
+
+
+// Pause rendering during zoom to prevent hanging
+var isZooming = false;
+map.on('zoomstart', function() { isZooming = true; });
+map.on('zoomend',   function() { 
+  isZooming = false;
+  // Redraw heatmap after zoom settles
+  setTimeout(function() {
+    if (showHeatmap && Object.keys(lastNodes).length > 0) drawHeatmap(lastNodes);
+  }, 300);
+});
+
+
+// Pause rendering during zoom to prevent hanging
+var isZooming = false;
+map.on('zoomstart', function() { isZooming = true; });
+map.on('zoomend',   function() {
+  isZooming = false;
+  // Redraw heatmap after zoom settles
+  setTimeout(function() {
+    if (showHeatmap && Object.keys(lastNodes).length > 0) drawHeatmap(lastNodes);
+  }, 300);
+});
+
+setTimeout(function(){map.invalidateSize();},500);
+setTimeout(function(){map.invalidateSize();},2000);
+
+// ── INDIVIDUAL TOURIST ROUTE ON CLICK ─────────────────────────────────────
+var selectedAgentRoute = null;
+var selectedAgentId = null;
+
+function showAgentRoute(agent) {
+  // Clear previous selected route
+  if (selectedAgentRoute) {
+    map.removeLayer(selectedAgentRoute);
+    selectedAgentRoute = null;
+  }
+
+  // If clicking same agent — deselect
+  if (selectedAgentId === agent.id) {
+    selectedAgentId = null;
+    return;
+  }
+
+  selectedAgentId = agent.id;
+
+  // Draw route from current location to destination
+  var from = ATTRACTIONS[agent.current];
+  var to   = ATTRACTIONS[agent.dest];
+  if (!from || !to) return;
+
+  // Animated dashed route line
+  selectedAgentRoute = L.polyline(
+    [[from[0],from[1]], [to[0],to[1]]],
+    {
+      color: PERSONA_COLORS[agent.persona] || '#1e40af',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '10 6',
+    }
+  ).addTo(map);
+
+  // Add arrow marker at destination
+  var destIcon = L.divIcon({
+    html: '<div style="background:'+( PERSONA_COLORS[agent.persona]||'#1e40af')+';color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">→</div>',
+    iconAnchor:[11,11], className:'',
+  });
+  var destMarker = L.marker([to[0],to[1]], {icon:destIcon, zIndexOffset:2000}).addTo(map);
+  destMarker.bindPopup(
+    '<b>'+agent.persona+'</b><br>'
+    +'<b>From:</b> '+agent.current+'<br>'
+    +'<b>Going to:</b> '+agent.dest+'<br>'
+    +'<b>Mode:</b> '+agent.mode+'<br>'
+    +'<b>Receptivity:</b> '+agent.receptivity+'<br>'
+    +'<b>Hotel:</b> '+agent.hotel+'<br>'
+    +'<b>Visits today:</b> '+agent.visits
+  ).openPopup();
+
+  // Store marker so we can remove it
+  if (window._destMarker) map.removeLayer(window._destMarker);
+  window._destMarker = destMarker;
+
+  // Pan map to show the route
+  map.fitBounds(selectedAgentRoute.getBounds(), {padding:[40,40]});
+}
+
+startPolling();
+
+// ── TOURIST PERSONA QUESTIONNAIRE ─────────────────────────────────────────
+var questAnswers = {1:null, 2:null, 3:null, 4:null};
+var questCurrent = 1;
+
+var PERSONA_RESULTS = {
+  ShortWalker: {
+    name: 'Short-Range Walker',
+    desc: 'You prefer walking and are very open to nudges. 72% of Berlin tourists are like you. The simulation highlights your high nudge receptivity.',
+    scenario: 'S1',
+    color: '#15803d',
+  },
+  ComfortMixed: {
+    name: 'Comfort / Mixed-Mode Traveller',
+    desc: 'You mix subway and walking and are moderately open to suggestions. 22% of tourists match your profile.',
+    scenario: 'S2',
+    color: '#d97706',
+  },
+  LongDistanceCar: {
+    name: 'Long-Distance Car Traveller',
+    desc: 'You drive to Berlin and rarely change plans. Only 4% of tourists match your profile — but you are key for S3 mode shift incentives.',
+    scenario: 'S3',
+    color: '#dc2626',
+  },
+  LongDistanceRail: {
+    name: 'Long-Distance Rail Traveller',
+    desc: 'You arrive by train from another city. You are very set in your plans. 2% of tourists match your profile.',
+    scenario: 'S3',
+    color: '#7c3aed',
+  },
+};
+
+function selectOpt(q, val, el) {
+  // Deselect others in this question
+  el.parentElement.querySelectorAll('.quest-opt').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');
+  questAnswers[q] = val;
+
+  // Move to next question after short delay
+  setTimeout(function() {
+    if (q < 4) {
+      document.getElementById('qq'+q).style.display='none';
+      document.getElementById('qq'+(q+1)).style.display='block';
+      questCurrent = q+1;
+      document.getElementById('quest-prog').style.width=(q*25)+'%';
+    } else {
+      // All answered — show result
+      document.getElementById('quest-prog').style.width='100%';
+      showQuestResult();
+    }
+  }, 400);
+}
+
+function showQuestResult() {
+  // Determine persona from answers
+  var persona = 'ShortWalker';
+  var a1 = questAnswers[1];
+  var a4 = questAnswers[4];
+
+  if (a1 === 'car') {
+    persona = 'LongDistanceCar';
+  } else if (a1 === 'train') {
+    persona = 'LongDistanceRail';
+  } else if (a1 === 'subway') {
+    persona = 'ComfortMixed';
+  } else {
+    persona = 'ShortWalker';
+  }
+
+  // Adjust by openness
+  if (a4 === 'low' && persona === 'ShortWalker') persona = 'ComfortMixed';
+  if (a4 === 'vlow') persona = a1 === 'car' ? 'LongDistanceCar' : 'LongDistanceRail';
+
+  var result = PERSONA_RESULTS[persona];
+  document.getElementById('quest-persona-name').textContent = 'Your persona: ' + result.name;
+  document.getElementById('quest-persona-name').style.color = result.color;
+  document.getElementById('quest-persona-desc').textContent = result.desc;
+  document.getElementById('quest-result').style.display='block';
+  document.getElementById('quest-btn').style.display='block';
+
+  // Store result for use when starting simulation
+  window.questPersona = persona;
+  window.questScenario = result.scenario;
+}
+
+function finishQuestionnaire() {
+  document.getElementById('quest-bg').style.display='none';
+  // Auto-select the recommended scenario
+  if (window.questScenario) {
+    document.getElementById('sel-scenario').value = window.questScenario;
+  }
+  // Show welcome message
+  setText('statustext', 'Welcome! Your persona: ' + (PERSONA_RESULTS[window.questPersona]||{name:''}).name + ' — Initialise to begin.');
+}
+
+function skipQuestionnaire() {
+  document.getElementById('quest-bg').style.display='none';
+}
+
+</script>
+
+<!-- TOURIST PERSONA QUESTIONNAIRE -->
+<div class="quest-bg" id="quest-bg">
+  <div class="quest-box">
+    <h2>Welcome to Berlin ABM</h2>
+    <p>Answer 4 quick questions to discover your tourist persona and get personalised simulation settings.</p>
+    <div class="quest-progress"><div class="quest-progress-bar" id="quest-prog" style="width:0%"></div></div>
+
+    <!-- Q1 -->
+    <div class="quest-q" id="qq1">
+      <label>1. How do you prefer to travel around Berlin?</label>
+      <div class="quest-options">
+        <div class="quest-opt" onclick="selectOpt(1,'walk',this)">🚶 Walk everywhere</div>
+        <div class="quest-opt" onclick="selectOpt(1,'subway',this)">🚇 Subway and walking</div>
+        <div class="quest-opt" onclick="selectOpt(1,'car',this)">🚗 Mostly by car</div>
+        <div class="quest-opt" onclick="selectOpt(1,'train',this)">🚆 Train from another city</div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quest-q" id="qq2" style="display:none">
+      <label>2. What type of attractions do you prefer?</label>
+      <div class="quest-options">
+        <div class="quest-opt" onclick="selectOpt(2,'culture',this)">🏛️ Museums and culture</div>
+        <div class="quest-opt" onclick="selectOpt(2,'nature',this)">🌳 Parks and nature</div>
+        <div class="quest-opt" onclick="selectOpt(2,'food',this)">🍜 Food and markets</div>
+        <div class="quest-opt" onclick="selectOpt(2,'history',this)">🏰 Historical sites</div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quest-q" id="qq3" style="display:none">
+      <label>3. How long do you stay at one place?</label>
+      <div class="quest-options">
+        <div class="quest-opt" onclick="selectOpt(3,'short',this)">⚡ Short — 15 to 30 min</div>
+        <div class="quest-opt" onclick="selectOpt(3,'medium',this)">⏱️ Medium — 30 to 60 min</div>
+        <div class="quest-opt" onclick="selectOpt(3,'long',this)">🕐 Long — over 1 hour</div>
+        <div class="quest-opt" onclick="selectOpt(3,'varies',this)">🔄 It varies</div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quest-q" id="qq4" style="display:none">
+      <label>4. How open are you to changing your plans?</label>
+      <div class="quest-options">
+        <div class="quest-opt" onclick="selectOpt(4,'high',this)">😊 Very open — suggest anything</div>
+        <div class="quest-opt" onclick="selectOpt(4,'medium',this)">🤔 Somewhat open — maybe</div>
+        <div class="quest-opt" onclick="selectOpt(4,'low',this)">😤 Prefer my own plan</div>
+        <div class="quest-opt" onclick="selectOpt(4,'vlow',this)">🚫 Never change plans</div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="quest-result" id="quest-result">
+      <h3 id="quest-persona-name">Your persona: Short-Range Walker</h3>
+      <p id="quest-persona-desc">You prefer walking and are very open to suggestions. The simulation will highlight agents like you.</p>
+    </div>
+
+    <button class="btn btn-blue" id="quest-btn" style="margin-top:16px;display:none" onclick="finishQuestionnaire()">
+      Start Simulation →
+    </button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="skipQuestionnaire()">
+      Skip — go straight to simulation
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
