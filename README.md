@@ -1,20 +1,17 @@
-Berlin Tourist Mobility ABM Simulation
-Suhas Akula — Student ID 100001985
-MEng Engineering and Sustainable Technology Management
-SRH Berlin University of Applied Sciences — September 2026
+# Berlin Tourist Mobility ABM Simulation
 
-Live Simulation:
-https://berlin-abm.onrender.com
+MEng Thesis — Suhas Akula — SRH Berlin 2026
 
-Source Code Repository:
-https://github.com/Suhas0816/berlin-abm
+Live simulation: https://berlin-abm.onrender.com
 
-Files:
-- app.py        Flask web app and SimAgent class
-- config.py     110 Berlin locations and persona parameters
-- network.py    OSMnx street network and routing
-- personas.py   Tourist persona profiles
-- weather.py    Weather state modifiers
-- interventions.py  S1 S2 S3 scenario logic
+Agent-based simulation of tourist mobility in Berlin
+calibrated from real MotionTag GPS data.
 
-Supervisor: Prof. Dr. Frank Wolter
+## How to Run Locally
+
+pip install -r requirements.txt
+python app.py
+
+## Supervisor
+Prof. Dr. Frank Wolter
+SRH Berlin University of Applied Sciences
